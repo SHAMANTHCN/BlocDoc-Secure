@@ -1,2 +1,2 @@
-# doc-mgmt-systm
+# BlocDosSecure
 A secure document management system using Blockchain technology. 
