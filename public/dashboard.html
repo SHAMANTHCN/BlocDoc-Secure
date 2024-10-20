@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - BlocDoc Secure</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+
+        .bg-gradient-to-br {
+            background-image: linear-gradient(to bottom right, var(--tw-gradient-stops));
+        }
+
+        .from-purple-900 {
+            --tw-gradient-from: #4c1d95;
+            --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, rgba(76, 29, 149, 0));
+        }
+
+        .via-blue-900 {
+            --tw-gradient-stops: var(--tw-gradient-from), #1e3a8a, var(--tw-gradient-to, rgba(30, 58, 138, 0));
+        }
+
+        .to-black {
+            --tw-gradient-to: #000000;
+        }
+
+        .bg-clip-text {
+            -webkit-background-clip: text;
+            background-clip: text;
+        }
+
+        .text-transparent {
+            color: transparent;
+        }
+
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #68D391;
+        }
+
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #68D391;
+        }
+
+        /* Neon gradient background */
+        .neon-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            background: linear-gradient(45deg, #ff00ff, #00ffff, #ff00ff, #00ffff);
+            background-size: 400% 400%;
+            animation: neonGradient 15s ease infinite;
+        }
+
+        @keyframes neonGradient {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        /* Overlay to dim the neon effect */
+        .neon-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background-color: rgba(0, 0, 0, 0.75);
+        }
+
+        /* Ensure content spans full height */
+        #app-container {
+            min-height: 100vh;
+            position: relative;
+            z-index: 1;
+        }
+
+        #main-content {
+            min-height: 100vh;
+        }
+
+        /* Remove conflicting background colors */
+        .bg-gray-900 {
+            background-color: transparent !important;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white">
+    <!-- Neon gradient background -->
+    <div class="neon-bg"></div>
+    <div class="neon-overlay"></div>
+
+    <div id="app-container">
+        <div id="main-content">
+            <!-- Navigation -->
+            <nav class="fixed top-0 left-0 z-50 w-full bg-black bg-opacity-90 text-white">
+                <div class="container mx-auto px-4 py-2 flex justify-between items-center">
+                    <div class="text-2xl font-bold text-blue-400">BlocDoc Secure</div>
+                    <div class="flex items-center space-x-4">
+                        <button id="logout-btn" class="text-white hover:text-red-400">
+                            Logout
+                        </button>
+                        <button id="menuToggle" class="focus:outline-none" aria-label="Toggle menu">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="mobileMenu" class="hidden fixed inset-0 bg-gradient-to-br from-purple-900 via-blue-900 to-black bg-opacity-95 overflow-y-auto">
+                    <div class="container mx-auto px-4 py-6">
+                        <button id="closeMenu" class="absolute top-4 right-4 text-white hover:text-green-400 transition-colors duration-300" aria-label="Close menu">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                        <ul class="space-y-4 mt-12">
+                            <li><a href="index.html" class="block py-2 px-4 text-white hover:text-blue-400 transition duration-300">Home</a></li>
+                            <li><a href="#dashboard" class="block py-2 px-4 text-green-400 hover:text-white transition duration-300">Dashboard</a></li>
+                            <li><a href="settings.html" class="block py-2 px-4 text-white hover:text-blue-400 transition duration-300">Account Settings</a></li>
+                            <li><a href="shared.html" class="block py-2 px-4 text-white hover:text-blue-400 transition duration-300">Shared Documents</a></li>
+                            <li><a href="notifications.html" class="block py-2 px-4 text-white hover:text-blue-400 transition duration-300">Notifications</a></li>
+                            <li><a href="audit.html" class="block py-2 px-4 text-white hover:text-blue-400 transition duration-300">Audit Log</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+
+            <!-- Main Content -->
+            <main class="pt-16">
+                <section id="dashboard" class="bg-gray-900 text-white py-12 px-4 sm:px-6 lg:px-8">
+                    <div class="max-w-7xl mx-auto">
+                        <h2 class="text-3xl font-bold mb-8 text-blue-400">Document Management Dashboard</h2>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <!-- Upload Document -->
+                            <div class="bg-gray-800 rounded-lg p-6 hover:shadow-lg hover:shadow-green-400 transition duration-300">
+                                <h3 class="text-xl font-semibold text-green-400 mb-4">Upload Document</h3>
+                                <form id="uploadForm" class="space-y-4">
+                                    <input type="file" id="fileInput" class="w-full p-2 bg-gray-700 rounded-md border border-gray-600 focus:outline-none focus:border-blue-400">
+                                    <button type="submit" class="w-full bg-green-400 text-black font-bold py-2 px-4 rounded hover:bg-blue-400 hover:text-white transition duration-300">Upload</button>
+                                </form>
+                            </div>
+                            
+                            <!-- Manage Documents -->
+                            <div class="bg-gray-800 rounded-lg p-6 hover:shadow-lg hover:shadow-blue-400 transition duration-300 overflow-hidden">
+                                <h3 class="text-xl font-semibold text-blue-400 mb-4">Manage Documents</h3>
+                                <ul id="documentList" class="space-y-2 overflow-y-auto max-h-60">
+                                    <!-- Document list will be populated dynamically -->
+                                </ul>
+                            </div>
+                            
+                            <!-- Document History -->
+                            <div class="bg-gray-800 rounded-lg p-6 hover:shadow-lg hover:shadow-purple-400 transition duration-300 overflow-hidden">
+                                <h3 class="text-xl font-semibold text-purple-400 mb-4">Document History</h3>
+                                <ul id="documentHistory" class="space-y-2 overflow-y-auto max-h-60">
+                                    <!-- Document history will be populated dynamically -->
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Recent Activity -->
+                        <div class="mt-12">
+                            <h3 class="text-2xl font-semibold text-blue-400 mb-4">Recent Activity</h3>
+                            <div class="bg-gray-800 rounded-lg p-6 overflow-hidden">
+                                <ul id="recentActivity" class="space-y-4 overflow-y-auto max-h-60">
+                                    <!-- Recent activity will be populated dynamically -->
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </main>
+
+            <!-- Footer -->
+            <footer class="bg-gray-900 text-gray-300 py-8">
+                <div class="container mx-auto px-4">
+                    <div class="flex flex-wrap justify-between items-center">
+                        <div class="w-full md:w-1/3 mb-6 md:mb-0">
+                            <h3 class="text-2xl font-bold text-green-400 mb-4">BlocDoc Secure</h3>
+                            <p class="text-sm">Secure document management powered by blockchain technology</p>
+                        </div>
+                        <div class="w-full md:w-1/3 mb-6 md:mb-0">
+                            <h4 class="text-lg font-semibold text-blue-400 mb-4">Quick Links</h4>
+                            <ul class="space-y-2">
+                                <li><a href="#dashboard" class="hover:text-green-400 transition-colors duration-300">Dashboard</a></li>
+                                <li><a href="shared.html" class="hover:text-green-400 transition-colors duration-300">Shared Documents</a></li>
+                                <li><a href="audit.html" class="hover:text-green-400 transition-colors duration-300">Audit Log</a></li>
+                            </ul>
+                        </div>
+                        <div class="w-full md:w-1/3">
+                            <h4 class="text-lg font-semibold text-purple-400 mb-4">Stay Connected</h4>
+                            <div class="flex space-x-4">
+                                <a href="#" class="text-gray-300 hover:text-green-400 transition-colors duration-300">
+                                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                        <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+                                    </svg>
+                                </a>
+                                <a href="#" class="text-gray-300 hover:text-blue-400 transition-colors duration-300">
+                                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                        <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0  3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"></path>
+                                    </svg>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="border-t border-gray-700 mt-8 pt-8 text-center">
+                        <p class="text-sm">© 2023 BlocDoc Secure. All rights reserved.</p>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const menuToggle = document.getElementById('menuToggle');
+            const closeMenu = document.getElementById('closeMenu');
+            const mobileMenu = document.getElementById('mobileMenu');
+            const logoutBtn = document.getElementById('logout-btn');
+            const uploadForm = document.getElementById('uploadForm');
+            const documentList = document.getElementById('documentList');
+            const documentHistory = document.getElementById('documentHistory');
+            const recentActivity = document.getElementById('recentActivity');
+
+            function setupMenuToggle() {
+                menuToggle.addEventListener('click', () => {
+                    mobileMenu.classList.toggle('hidden');
+                });
+
+                closeMenu.addEventListener('click', () => {
+                    mobileMenu.classList.add('hidden');
+                });
+
+                const links = mobileMenu.querySelectorAll('a');
+                links.forEach(link => {
+                    link.addEventListener('click', (event) => {
+                        if (link.getAttribute('href') === '#dashboard') {
+                            mobileMenu.classList.add('hidden');
+                            return;
+                        }
+                        mobileMenu.classList.add('hidden');
+                    });
+                });
+            }
+
+            setupMenuToggle();
+
+            logoutBtn.addEventListener('click', () => {
+                localStorage.removeItem('token');
+                window.location.href = 'index.html';
+            });
+
+            if (!localStorage.getItem('token')) {
+                window.location.href = 'index.html';
+            }
+
+            // File upload functionality
+            uploadForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const fileInput = document.getElementById('fileInput');
+                const file = fileInput.files[0];
+                if (!file) {
+                    alert('Please select a file to upload');
+                    return;
+                }
+
+                const formData = new FormData();
+                formData.append('file', file);
+
+                try {
+                    const response = await fetch('http://localhost:5000/api/upload', {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'Authorization': `Bearer ${localStorage.getItem('token')}`
+                        }
+                    });
+
+                    if (response.ok) {
+                        const result = await response.json();
+                        alert(result.message);
+                        fileInput.value = '';
+                        fetchDocuments();
+                        fetchRecentActivity();
+                    } else {
+                        const error = await response.json();
+                        alert(error.error || 'File upload failed');
+                    }
+                } catch (error) {
+                    console.error('Error uploading file:', error);
+                    alert('An error occurred while uploading the file');
+                }
+            });
+
+            // Fetch and display documents
+            async function fetchDocuments() {
+                try {
+                    const response = await fetch('http://localhost:5000/api/documents', {
+                        headers: {
+                            'Authorization': `Bearer ${localStorage.getItem('token')}`
+                        }
+                    });
+
+                    if (response.ok) {
+                        const documents = await response.json();
+                        displayDocuments(documents);
+                    } else {
+                        console.error('Failed to fetch documents');
+                    }
+                } catch (error) {
+                    console.error('Error fetching documents:', error);
+                }
+            }
+
+            function displayDocuments(documents) {
+                documentList.innerHTML = '';
+                documents.forEach(doc => {
+                    const li = document.createElement('li');
+                    li.className = 'flex flex-col mb-2 p-2 bg-gray-700 rounded';
+                    li.innerHTML = `
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="font-semibold">${doc.fileName}</span>
+                            <div class="space-x-2">
+                                <button class="text-green-400 hover:text-white" onclick="shareDocument('${doc._id}')">Share</button>
+                                <button class="text-blue-400 hover:text-white" onclick="verifyDocument('${doc._id}')">Verify</button>
+                                <button class="text-red-500 hover:text-white" onclick="deleteDocument('${doc._id}')">Delete</button>
+                            </div>
+                        </div>
+                        <span class="text-xs text-gray-400">IPFS: ${doc.ipfsHash}</span>
+                    `;
+                    documentList.appendChild(li);
+                });
+            }
+
+            // Document actions
+            window.shareDocument = async (docId) => {
+                const email = prompt("Enter the email of the user you want to share the document with:");
+                if (!email) return;
+
+                try {
+                    const response = await fetch(`http://localhost:5000/api/share/${docId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ email })
+                    });
+
+                    if (response.ok) {
+                        alert('Document shared successfully');
+                        fetchRecentActivity();
+                    } else {
+                        const errorData = await response.json();
+                        alert(errorData.error || 'Failed to share document');
+                    }
+                } catch (error) {
+                    console.error('Error sharing document:', error);
+                    alert('An error occurred while sharing the document');
+                }
+            };
+
+            window.verifyDocument = async (docId) => {
+                try {
+                    const response = await fetch(`http://localhost:5000/api/verify/${docId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${localStorage.getItem('token')}`
+                        }
+                    });
+
+                    if (response.ok) {
+                        alert('Document verified successfully');
+                        fetchRecentActivity();
+                    } else {
+                        alert('Failed to verify document');
+                    }
+                } catch (error) {
+                    console.error('Error verifying document:', error);
+                    alert('An error occurred while verifying the document');
+                }
+            };
+
+            window.deleteDocument = async (docId) => {
+                if (confirm('Are you sure you want to delete this document?')) {
+                    try {
+                        const response = await fetch(`http://localhost:5000/api/documents/${docId}`, {
+                            method: 'DELETE',
+                            headers: {
+                                'Authorization': `Bearer ${localStorage.getItem('token')}`
+                            }
+                        });
+
+                        if (response.ok) {
+                            alert('Document deleted successfully');
+                            fetchDocuments();
+                            fetchRecentActivity();
+                        } else {
+                            alert('Failed to delete document');
+                        }
+                    } catch (error) {
+                        console.error('Error deleting document:', error);
+                        alert('An error occurred while deleting the document');
+                    }
+                }
+            };
+
+            // Fetch and display recent activity
+            async function fetchRecentActivity() {
+                try {
+                    const response = await fetch('http://localhost:5000/api/recent-activity', {
+                        headers: {
+                            'Authorization': `Bearer ${localStorage.getItem('token')}`
+                        }
+                    });
+
+                    if (response.ok) {
+                        const activities = await response.json();
+                        displayRecentActivity(activities);
+                        displayDocumentHistory(activities);
+                    } else {
+                        console.error('Failed to fetch recent activity');
+                    }
+                } catch (error) {
+                    console.error('Error fetching recent activity:', error);
+                }
+            }
+
+            function displayRecentActivity(activities) {
+                recentActivity.innerHTML = '';
+                activities.forEach(activity => {
+                    const li = document.createElement('li');
+                    li.className = 'flex items-center';
+                    li.innerHTML = `
+                        <svg class="w-6 h-6 mr-2 ${getActivityIconColor(activity.type)}" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            ${getActivityIcon(activity.type)}
+                        </svg>
+                        <span>${activity.description}</span>
+                    `;
+                    recentActivity.appendChild(li);
+                });
+            }
+
+            function displayDocumentHistory(activities) {
+                documentHistory.innerHTML = '';
+                activities.forEach(activity => {
+                    const li = document.createElement('li');
+                    li.className = 'text-sm';
+                    li.innerHTML = `
+                        <span class="${getActivityTextColor(activity.type)}">${capitalizeFirstLetter(activity.type)}:</span>
+                        ${activity.description} (${formatDate(activity.date)})
+                    `;
+                    documentHistory.appendChild(li);
+                });
+            }
+
+            function getActivityIconColor(type) {
+                switch (type) {
+                    case 'upload': return 'text-green-400';
+                    case 'share': return 'text-blue-400';
+                    case 'delete': return 'text-red-400';
+                    case 'verify': return 'text-purple-400';
+                    default: return 'text-gray-400';
+                }
+            }
+
+            function getActivityIcon(type) {
+                switch (type) {
+                    case 'upload': return '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>';
+                    case 'share': return '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>';
+                    case 'delete': return '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>';
+                    case 'verify': return '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>';
+                    default: return '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>';
+                }
+            }
+
+            function getActivityTextColor(type) {
+                return getActivityIconColor(type);
+            }
+
+            function capitalizeFirstLetter(string) {
+                return string.charAt(0).toUpperCase() + string.slice(1);
+            }
+
+            function formatDate(dateString) {
+                if (!dateString) return 'N/A';
+                const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+                return new Date(dateString).toLocaleDateString(undefined, options);
+            }
+
+            // Initial fetch of documents and recent activity
+            fetchDocuments();
+            fetchRecentActivity();
+        });
+    </script>
+</body>
+</html>
